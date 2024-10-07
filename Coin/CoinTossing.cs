@@ -10,32 +10,67 @@ namespace Coin
 {
     internal class CoinTossing
     {
-        
-        private static bool FlipCoin()
+        static Random rand1 = new Random((int)DateTime.Now.Ticks & 0x0000FFFF);
+        static Random rand2 = new Random((int)DateTime.Now.Ticks & 0x0000FFFF);
+
+
+        private static bool FlipCoin(double time) //уже не coin и не flip
         {
-            Random rand = new Random((int)DateTime.Now.Ticks & 0x0000FFFF);
-            return Convert.ToBoolean(rand.Next(0, 2));
+            //Random rand = new Random((int)DateTime.Now.Ticks & 0x0000FFFF);
+            //return Convert.ToBoolean(rand.Next(0, 2));
+
+            double first = CalcFirst();
+            double second = CalcSecond();
+            if (Math.Abs(first - second) <= time)
+            {
+                return true;
+            }
+            return false;
         }
 
-        private static decimal[] Experiment(int quantity)
+
+
+        private static double FirstStudent()
         {
-            decimal[] result = new decimal[quantity];
+            return rand1.NextDouble();
+        }
+
+        private static double SecondStudent()
+        {
+            return rand2.NextDouble();
+        }
+
+        private static double CalcFirst()
+        {
+            return 1 - Math.Sqrt(FirstStudent());
+        }
+        private static double CalcSecond()
+        {
+            return Math.Sqrt(SecondStudent());
+        }
+
+        private static double[] Experiment(int quantity, double time)
+        {
+            double[] result = new double[quantity];
             int counter = 0;
             for (int i = 0; i < result.Length; i++)
             {
-                if (FlipCoin())
+                if (FlipCoin(time))
                     counter++;
-                result[i] = counter / (i + 1);
+                result[i] = (double)counter / (i + 1);
             }
             return result;
         }
 
-        public static decimal[,] ExpSerial(int M, int N)
+        
+
+
+        public static double[,] ExpSerial(int M, int N, double time)
         {
-            decimal[,] result = new decimal[M,N];
+            double[,] result = new double[M,N];
             for (int i = 0; i < M; i++)
             {
-                decimal[] resultN = Experiment(N);
+                double[] resultN = Experiment(N, time);
                 for (int j = 0; j < N; j++)
                 {
                     result[i, j] = resultN[j];
